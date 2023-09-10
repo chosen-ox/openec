@@ -6,7 +6,7 @@ FSTYPE=$1
 echo "evn.sh fstyp: "$FSTYPE
 
 if [ "$FSTYPE" = "HDFS3" ]; then
-  export CLASSPATH=`hadoop classpath --glob`
+  export CLASSPATH=`/home/nclab/openec/hadoop-3.0.0-src/hadoop-dist/target/hadoop-3.0.0/bin/hadoop classpath --glob`
 elif [ "$FSTYPE" = "HDFSRAID" ]; then
   export CLASSPATH=$JAVA_HOME/lib
   export CLASSPATH=${CLASSPATH}:${HADOOP_HOME}/conf

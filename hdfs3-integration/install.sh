@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HADOOP_SRC_DIR=/home/openec/hadoop-3.0.0-src
+HADOOP_SRC_DIR=/home/nclab/openec/hadoop-3.0.0-src
 
 # 0. cp third party libraries
 cp ../lib/* ./

@@ -52,18 +52,20 @@ os.system("killall OECCoordinator")
 os.system("sudo service redis_6379 restart")
 command="cd "+home_dir+";  . script/env.sh "+fstype+"; ./OECCoordinator &> "+home_dir+"/coor_output &"
 print(command)
-# subprocess.Popen(['/bin/bash', '-c', command])
+subprocess.Popen(['/bin/bash', '-c', command])
 
 for slave in slavelist:
     print("start slave on " + slave)
     os.system("ssh " + slave + " \"killall OECAgent \"")
     os.system("ssh " + slave + " \"killall OECClient \"")
-    os.system("ssh " + slave + " \"sudo service redis_6379 restart\"")
+    os.system("ssh " + slave + " \"sudo -S service redis_6379 restart\"")
     command="scp "+home_dir+"/OECAgent "+slave+":"+home_dir+"/"
     os.system(command)
     command="scp "+home_dir+"/OECClient "+slave+":"+home_dir+"/"
     os.system(command)
     command="scp "+home_dir+"/HDFSClient "+slave+":"+home_dir+"/"
+    os.system(command)
+    command="scp "+home_dir+"/script/env.sh "+slave+":"+home_dir+"/script"
     os.system(command)
     os.system("ssh " + slave + " \"redis-cli flushall \"")
     command="ssh "+slave+" \"cd "+home_dir+"; . script/env.sh "+fstype+"; ./OECAgent &> "+home_dir+"/agent_output &\""
