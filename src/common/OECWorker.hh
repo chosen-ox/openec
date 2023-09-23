@@ -20,7 +20,7 @@
 #include "../util/RedisUtil.hh"
 
 class OECWorker {
-  private: 
+private:
     Config* _conf;
 
     redisContext* _processCtx;
@@ -28,7 +28,7 @@ class OECWorker {
     redisContext* _coorCtx;
 
     UnderFS* _underfs;
-  public:
+public:
     OECWorker(Config* conf);
     ~OECWorker();
     void doProcess();
@@ -49,21 +49,22 @@ class OECWorker {
                     int round,
                     bool zeropadding);
     // compute
-    void computeWorker(vector<ECTask*> compute, 
+    void computeWorker(vector<ECTask*> compute,
                        BlockingQueue<OECDataPacket*>** readQueue,
                        FSObjOutputStream** objstreams,
                        int stripenum,
                        int ecn,
                        int eck,
-                       int ecw);
+                       int ecw,
+                       string ecid);
     void computeWorker(FSObjInputStream** readStreams,
-                              vector<int> idlist,
-                              BlockingQueue<OECDataPacket*>* writeQueue,
-                              vector<ECTask*> computeTasks,
-                              int stripenum,
-                              int ecn,
-                              int eck,
-                              int ecw);
+                       vector<int> idlist,
+                       BlockingQueue<OECDataPacket*>* writeQueue,
+                       vector<ECTask*> computeTasks,
+                       int stripenum,
+                       int ecn,
+                       int eck,
+                       int ecw);
     void computeWorkerDegradedOffline(FSObjInputStream** readStreams,
                                       vector<int> idlist,
                                       unordered_map<int, vector<int>> sid2Cids,
@@ -88,11 +89,11 @@ class OECWorker {
                            vector<int> idxlist,
                            unordered_map<int, int> refs);
     void partialCacheWorker(BlockingQueue<OECDataPacket*>* cacheQueue,
-                           int pktnum,
-                           string keybase,
-                           int w,
-                           vector<int> idxlist,
-                           unordered_map<int, int> refs);
+                            int pktnum,
+                            string keybase,
+                            int w,
+                            vector<int> idxlist,
+                            unordered_map<int, int> refs);
     void fetchWorker(BlockingQueue<OECDataPacket*>* fetchQueue,
                      string keybase,
                      unsigned int loc,
@@ -110,8 +111,8 @@ class OECWorker {
                        int num,
                        unordered_map<int, vector<int>> coefs,
                        vector<int> cfor,
-		       unordered_map<int, BlockingQueue<OECDataPacket*>*> writeQueue,
-                       int slicesize);
+                       unordered_map<int, BlockingQueue<OECDataPacket*>*> writeQueue,
+    int slicesize);
     void cacheWorker(BlockingQueue<OECDataPacket*>* writeQueue,
                      string keybase,
                      int num,

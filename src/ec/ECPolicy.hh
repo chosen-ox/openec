@@ -11,6 +11,7 @@
 #include "RSPIPE.hh"
 #include "RSPPR.hh"
 #include "WASLRC.hh"
+#include "ShiftXor.hh"
 #include "../inc/include.hh"
 
 using namespace std;
