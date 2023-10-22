@@ -17,6 +17,7 @@
 <attribute><name>ec.policy</name>
 <value><ecid>rs_4_3</ecid><class>RSCONV</class><n>4</n><k>3</k><w>1</w><opt>-1</opt></value>
 <value><ecid>rs_2_1</ecid><class>RSCONV</class><n>2</n><k>1</k><w>1</w><opt>-1</opt></value>
+<value><ecid>sxor</ecid><class>ShiftXor</class><n>4</n><k>3</k><w>1</w><opt>-1</opt></value>
 </attribute>
 <attribute><name>offline.pool</name>
 <value><poolid>rs_4_3_pool</poolid><ecid>rs_4_3</ecid><base>1</base></value>

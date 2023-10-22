@@ -608,13 +608,60 @@ void OECWorker::computeWorker(vector<ECTask*> computeTasks,
          << ", splitsize: " << splitsize
          << ", ecn: " << ecn
          << ", eck: " << eck
-         << ", ecw: " << ecw << endl;
+         << ", ecw: " << ecw 
+	 << ", ecid:" << ecid << endl;
 
     for (int stripeid=0; stripeid<stripenum; stripeid++) {
+	if (ecid == "sxor") {
+		cout << "shift xor encode!!!" << endl;
+                int col = eck;
+                int row = ecn - eck;
+		for (int pktidx=0; pktidx < eck; pktidx++) {
+            		OECDataPacket* curPkt = readQueue[pktidx]->pop();
+            		curStripe[pktidx] = curPkt;
+        	}
+
+
+        	// now we have k pkt in a stripe, prepare pkt for parity pkt
+                int offset = 32 * (col - 1) * (row / 2);
+
+        	for (int i=0; i<(ecn-eck); i++) {
+            		OECDataPacket* paritypkt = new OECDataPacket(pktsize + offset);
+            		curStripe[eck+i] = paritypkt;
+        	}
+
+        	unordered_map<int, char*> bufMap;
+        	// add pkt into bufMap
+        	for (int i=0; i<ecn; i++) {
+            		char* pktbuf = curStripe[i]->getData();
+			bufMap.insert(make_pair(i, pktbuf));
+        	}
+
+
+
+                int* matrix = (int*)calloc(row*col, sizeof(int));
+                char** data = (char**)calloc(col, sizeof(char*));
+                char** code = (char**)calloc(row, sizeof(char*));
+
+                for (int bufIdx = 0; bufIdx < col; bufIdx++) {
+                    data[bufIdx] = bufMap[bufIdx];
+                }
+                for (int i = 0; i < row; i++) {
+		    code[i] = bufMap[col + row];
+                }
+
+                Computation::Multi(code, data, matrix, row, col, splitsize, "Shift");
+
+		return ;
+            }
+
+
         for (int pktidx=0; pktidx < eck; pktidx++) {
             OECDataPacket* curPkt = readQueue[pktidx]->pop();
             curStripe[pktidx] = curPkt;
         }
+
+
         // now we have k pkt in a stripe, prepare pkt for parity pkt
         for (int i=0; i<(ecn-eck); i++) {
             OECDataPacket* paritypkt = new OECDataPacket(pktsize);
@@ -631,32 +678,13 @@ void OECWorker::computeWorker(vector<ECTask*> computeTasks,
                 bufMap.insert(make_pair(ecidx, bufaddr));
             }
         }
-        // now perform computation in compute task one by one
+
+	        // now perform computation in compute task one by one
         for (int taskid=0; taskid<computeTasks.size(); taskid++) {
             ECTask* compute = computeTasks[taskid];
             vector<int> children = compute->getChildren();
 
-            if (ecid == "sxor") {
-                int col = ecn;
-                int row = ecn - eck;
-
-
-                int* matrix = (int*)calloc(row*col, sizeof(int));
-                char** data = (char**)calloc(col, sizeof(char*));
-                char** code = (char**)calloc(row, sizeof(char*));
-
-                for (int bufIdx = 0; bufIdx < col; bufIdx++) {
-                    data[bufIdx] = bufMap[bufIdx];
-                }
-                int offset = 32 * (col - 1) * (row / 2);
-                for (int i = 0; i < row; i++) {
-                    code[i] = (char *)calloc(splitsize + offset, sizeof(char));
-                }
-
-                Computation::Multi(code, data, matrix, row, col, splitsize, "Shift");
-
-		return ;
-            }
+            
 
             if (stripeid == 0) {
                 cout << "children: ";
