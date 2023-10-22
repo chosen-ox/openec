@@ -37,6 +37,7 @@ void FSObjOutputStream::writeObj() {
   int pktid = 0;
 
   for (int pktid=0; pktid < _totalPktNum; pktid++) {
+	cout << "writing" << pktid <<endl;
     OECDataPacket* curPkt = _queue->pop();
     _objsize += curPkt->getDatalen();
     // write to hdfs
@@ -44,6 +45,7 @@ void FSObjOutputStream::writeObj() {
     _underfs->flushFile(_underfile);
     delete curPkt;
   }
+  cout << "finished writing" << endl;
 
   gettimeofday(&time2, NULL);
   cout << "FSObjOutputStream.writeObj " << _objname << ".writeFileTime: " << RedisUtil::duration(time1, time2) << endl;

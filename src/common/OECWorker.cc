@@ -166,12 +166,15 @@ void OECWorker::onlineWrite(string filename, string ecid, int filesizeMB) {
     // join
     for (int i=0; i<eck; i++) loadThreads[i].join();
     computeThread.join();
+    cout << "computethread finished" << endl;
     for (int i=0; i<ecn; i++) persistThreads[i].join();
 
+    cout << "writeobj finished" << endl;
     // check the finish flag in streams and then return finish flag for file
     bool finish = true;
     for (int i=0; i<ecn; i++) {
         if (!objstreams[i]->getFinish()) {
+		cout << "write unfinished" << endl;
             finish = false;
             break;
         }
@@ -647,12 +650,13 @@ void OECWorker::computeWorker(vector<ECTask*> computeTasks,
                     data[bufIdx] = bufMap[bufIdx];
                 }
                 for (int i = 0; i < row; i++) {
-		    code[i] = bufMap[col + row];
+		    code[i] = bufMap[col + i];
                 }
 
                 Computation::Multi(code, data, matrix, row, col, splitsize, "Shift");
+		cout << "finish one" << endl;
 
-		return ;
+		continue ;
             }
 
 

@@ -17,7 +17,9 @@ int Computation::singleMulti(int a, int b, int w) {
 #define TOTAL_SLICE_NUM (CHUNK_SIZE / SLICE)
 
 void Computation::Multi(char **dst, char **src, int *mat, int rowCnt, int colCnt, int len, string lib) {
+	cout << 0 << endl;
     if (lib == "Jerasure") {
+	    cout << -1 << endl;
         Computation::_cLock.lock();
         jerasure_matrix_encode(colCnt, rowCnt, GF_W, mat, src, dst, len);
         Computation::_cLock.unlock();
@@ -36,6 +38,8 @@ void Computation::Multi(char **dst, char **src, int *mat, int rowCnt, int colCnt
         const uint64_t chunk_size = 128;//窗口宽度为128个cell
         const uint64_t chunk_num = TOTAL_SLICE_NUM / chunk_size;//一个数据包的窗口数量
         for (chunk_slice_id = 0; chunk_slice_id < chunk_num; chunk_slice_id++) {
+		cout << "id" << chunk_slice_id << endl;
+		cout << 1<< endl;
             const uint64_t slice_id_start = chunk_slice_id * chunk_size;//当前窗口的起始cell序号
             const uint64_t slice_id_end = chunk_slice_id * chunk_size + chunk_size;//下一个窗口的开始cell序号
             //按x1的计算位置先把x1的当前窗口部分放到3个parity_packet中
@@ -43,6 +47,8 @@ void Computation::Multi(char **dst, char **src, int *mat, int rowCnt, int colCnt
 
                 slice_offset_d = slice_id * SLICE; // point to the start point of memory block (packet $slice_id)
 
+
+		cout << 2<< endl;
                 mxx1 = _mm256_loadu_si256((__m256i * ) & src[0][slice_offset_d]);//取出x1的一个cell，大小为32字节
 
                 for (unsigned int i = 0; i < d; i++) {
@@ -50,11 +56,14 @@ void Computation::Multi(char **dst, char **src, int *mat, int rowCnt, int colCnt
                                         mxx1);
                     _mm256_storeu_si256((__m256i * ) & dst[i + d][slice_offset_d], mxx1);
                 }
-
+		cout << 3 << endl;
                 if ((rowCnt % 2) == 1)
+		cout << 4 << endl;
                     _mm256_storeu_si256((__m256i * ) & dst[d][slice_offset_d], mxx1);
 
             }
+		cout << 5<< endl;
+
             //按x2的计算位置把x2的当前窗口部分与3个parity_packet进行xor并更新parity_packet
             for (unsigned int i = 1; i < colCnt; i++) {
                 for (slice_id = slice_id_start; slice_id < slice_id_end; slice_id++) {
@@ -79,7 +88,9 @@ void Computation::Multi(char **dst, char **src, int *mat, int rowCnt, int colCnt
 
 
                     if ((rowCnt % 2) == 1)
-                        _mm256_storeu_si256((__m256i * ) & dst[d][slice_offset_d], mxx1);
+
+                        mxx2 = _mm256_xor_si256(mxx1, *((__m256i * ) & dst[d][slice_offset_d]));
+                        _mm256_storeu_si256((__m256i * ) & dst[d][slice_offset_d], mxx2);
                 }
             }
         }
